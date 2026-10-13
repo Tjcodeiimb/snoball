@@ -1,136 +1,126 @@
 import * as THREE from "three";
 
+/* ════════════════════════════════════════════════════════════════
+   Snoball: one fixed WebGL scene behind the page. A small cartoon
+   snowball gathers flakes and grows section by section until it fills
+   the bottom of the screen. Native vertical scroll only.
+   ════════════════════════════════════════════════════════════════ */
+
 const root = document.documentElement;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isNarrow = () => innerWidth / innerHeight < 0.85 || innerWidth < 640;
 document.getElementById("year").textContent = new Date().getFullYear();
 
-/* ════════════════ Intro (same choreography as upforgeconsulting.com) ════════════════
-   The headline card starts centred and scaled up, settles with a small wobble,
-   glides back into its bento slot, then the nav drops and the other cards rise. */
-(function intro() {
-  const headline = document.querySelector(".card-headline");
-  const finish = () => { root.classList.add("intro-done", "nav-in", "hero-in"); root.classList.remove("intro-lock"); };
-  if (root.classList.contains("intro-lock")) window.scrollTo(0, 0);
+/* ───────── Scene keyframes, one per section ─────────
+   x, y: ball centre as a fraction of the half-viewport (−1 left/bottom … 1 right/top)
+   s:    ball radius as a fraction of the half-viewport height (grows all the way down)
+   acc:  how many loose flakes have been absorbed (0 … 1)
+   rings: channel orbit rings (belief section)
+   mx, my: optional overrides for narrow screens */
+const KEYS = {
+  hero:     { x:  0.52, y:  0.04, s: 0.15, acc: 0.00, rings: 0, mx: 0.42, my: 0.6 },
+  clients:  { x:  0.80, y:  0.55, s: 0.17, acc: 0.08, rings: 0 },
+  belief:   { x: -0.55, y: -0.50, s: 0.20, acc: 0.18, rings: 1 },
+  model:    { x:  0.80, y:  0.45, s: 0.24, acc: 0.28, rings: 0 },
+  pillars:  { x: -0.72, y: -0.35, s: 0.28, acc: 0.38, rings: 0 },
+  channels: { x:  0.88, y:  0.58, s: 0.31, acc: 0.46, rings: 0 },
+  work:     { x: -1.00, y: -0.20, s: 0.34, acc: 0.54, rings: 0 },
+  cases:    { x:  0.95, y: -0.45, s: 0.38, acc: 0.62, rings: 0 },
+  voice:    { x:  0.92, y:  0.55, s: 0.42, acc: 0.70, rings: 0 },
+  scale:    { x:  0.88, y:  0.60, s: 0.47, acc: 0.80, rings: 0 },
+  owled:    { x:  0.90, y:  0.62, s: 0.53, acc: 0.90, rings: 0 },
+  cta:      { x:  0.00, y: -1.42, s: 1.02, acc: 1.00, rings: 0, mx: 0, my: -1.25 },
+};
+const FIELDS = ["x", "y", "s", "acc", "rings"];
 
-  function start() {
-    if (!root.classList.contains("hero-anim") || !headline || !headline.animate || root.classList.contains("hero-in")) { finish(); return; }
-    const r = headline.getBoundingClientRect();
-    const vw = innerWidth, vh = innerHeight;
-    const dx = vw / 2 - (r.left + r.width / 2);
-    const dy = vh / 2 - (r.top + r.height / 2);
-    const big = vw <= 768
-      ? Math.max(1, Math.min(1.1, (vw - 8) / r.width, (vh * 0.8) / r.height))
-      : Math.min(1.5, (vw * 0.92) / r.width, (vh * 0.86) / r.height);
-    const at = (x, y, s, rot) => `translate(${x}px,${y}px) scale(${s}) rotate(${rot}deg)`;
-    const glide = "cubic-bezier(0.16, 1, 0.3, 1)";
-    const soft = "cubic-bezier(0.45, 0, 0.55, 1)";
-    const anim = headline.animate([
-      { offset: 0, opacity: 0, transform: at(dx, dy + 34, big * 0.95, -2), easing: glide },
-      { offset: 0.2, opacity: 1, transform: at(dx, dy - 5, big, 0.9), easing: soft },
-      { offset: 0.27, transform: at(dx, dy + 2, big, -0.4), easing: soft },
-      { offset: 0.33, transform: at(dx, dy, big, 0), easing: "cubic-bezier(0.7, 0, 0.2, 1)" },
-      { offset: 0.52, transform: at(dx, dy, 0.97, -0.7), easing: soft },
-      { offset: 0.58, transform: at(dx, dy, 1.012, 0.35), easing: soft },
-      { offset: 0.63, transform: at(dx, dy, 1, 0), easing: "cubic-bezier(0.65, 0, 0.25, 1)" },
-      { offset: 0.9, transform: at(-3, 4, 1, -0.5), easing: soft },
-      { offset: 0.96, transform: at(1, -1, 1, 0.15), easing: soft },
-      { offset: 1, opacity: 1, transform: at(0, 0, 1, 0) },
-    ], { duration: 3000, fill: "forwards" });
-    setTimeout(() => root.classList.add("nav-in"), 2000);
-    anim.onfinish = () => { root.classList.add("intro-done"); anim.cancel(); root.classList.add("hero-in"); root.classList.remove("intro-lock"); };
-  }
-  if (document.fonts && document.fonts.ready) Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 800))]).then(start);
-  else start();
-})();
-
-/* ════════════════ Client logos ════════════════ */
-const TOP = [
-  ["Apple", "apple"], ["Emergent", "emergent"], ["Wispr Flow", "wisprflow"],
-  ["OpenAI", "openai"], ["Replit", "replit"], ["Gamma", "gamma"],
-];
-const ROW_A = [
-  ["Higgsfield", "higgsfield"], ["Amazon", "amazon"], ["Disney+ Hotstar", "hotstar"], ["Swiggy", "swiggy"],
-  ["Zomato", "zomato"], ["Zepto", "zepto"], ["Flipkart", "flipkart"], ["Air India", "airindia"],
-  ["HP", "hp"], ["Paytm", "paytm"], ["PhonePe", "phonepe"], ["Razorpay", "razorpay"], ["CRED", "cred"],
-  ["MakeMyTrip", "makemytrip"], ["Groww", "groww"], ["Rephrase.ai", "rephraseai"],
-];
-const ROW_B = [
-  ["Estée Lauder", "esteelauder"], ["Clinique", "clinique"], ["M·A·C", "mac"], ["The Ordinary", "theordinary"],
-  ["Warner Music Group", "warnermusic"], ["Tata Communications", "tatacommunications"], ["boAt", "boat"],
-  ["ACKO", "acko"], ["Godrej Properties", "godrej"], ["HDFC Life", "hdfclife"], ["Unacademy", "unacademy"],
-  ["InMobi", "inmobi"], ["ShareChat", "sharechat"], ["Licious", "licious"], ["Manyavar", "manyavar"],
-  ["Buy Me a Coffee", "buymeacoffee"], ["Quizizz", "quizizz"], ["smallcase", "smallcase"], ["Glance", "glance"],
-];
-
-// symbols that flatten into a solid blob in monochrome read better as plain names
-const NAME_ONLY = new Set(["phonepe", "sharechat", "makemytrip"]);
-// stacked or fine-print wordmarks need more height to stay legible
+/* ════════════════ Logos ════════════════ */
+const TOP = ["apple", "emergent", "wisprflow", "openai", "replit", "gamma"];
 const TALL = new Set(["esteelauder", "hdfclife", "warnermusic", "hotstar", "cred", "tatacommunications"]);
+const slugOf = (f) => f.file.replace(/\.(svg|png|webp)$/, "");
 
-function logoEl([name, slug], files) {
+function logoEl(f) {
   const span = document.createElement("span");
-  const f = NAME_ONLY.has(slug) ? null : files.get(slug);
-  if (!f) {
-    span.className = "logo";
-    span.innerHTML = `<span class="logo-name"></span>`;
-    span.firstChild.textContent = name;
-    return span;
-  }
-  span.className = `logo ${f.kind === "symbol" ? "symbol" : ""} ${TALL.has(slug) ? "tall" : ""}`;
+  span.className = `logo tone-${f.tone || "dark"} ${f.kind === "symbol" ? "symbol" : ""} ${TALL.has(slugOf(f)) ? "tall" : ""}`;
   const img = new Image();
   img.src = `assets/logos/${f.file}`;
-  img.alt = name;
-  img.loading = "lazy";
+  img.alt = f.name;
   img.decoding = "async";
-  img.onerror = () => { span.innerHTML = ""; const t = document.createElement("span"); t.className = "logo-name"; t.textContent = name; span.append(t); };
   span.append(img);
-  // a bare symbol isn't recognisable for every brand, so name it alongside
-  if (f.kind === "symbol" && !["apple", "openai"].includes(slug)) {
-    const t = document.createElement("span"); t.className = "logo-name"; t.textContent = name; span.append(t);
-  }
   return span;
 }
 
 async function renderLogos() {
-  let files = new Map();
+  let list = [];
   try {
     const res = await fetch("assets/logos/manifest.json", { cache: "no-cache" });
-    if (res.ok) (await res.json()).forEach((f) => files.set(f.file.replace(/\.svg$/, ""), f));
-  } catch (e) { /* fall back to typeset names */ }
+    if (res.ok) list = await res.json();
+  } catch (e) { /* leave the rows empty rather than show fake marks */ }
+  const bySlug = new Map(list.map((f) => [slugOf(f), f]));
 
   const top = document.getElementById("logo-top");
-  TOP.forEach((b) => { const li = document.createElement("li"); li.append(logoEl(b, files)); top.append(li); });
+  TOP.forEach((slug) => {
+    const f = bySlug.get(slug);
+    if (!f) return;
+    const li = document.createElement("li");
+    li.append(logoEl(f));
+    top.append(li);
+  });
 
-  for (const [id, list] of [["logo-row-a", ROW_A], ["logo-row-b", ROW_B]]) {
+  const rest = list.filter((f) => !TOP.includes(slugOf(f)));
+  const half = Math.ceil(rest.length / 2);
+  [["logo-row-a", rest.slice(0, half)], ["logo-row-b", rest.slice(half)]].forEach(([id, items]) => {
     const row = document.getElementById(id);
-    // two copies so the loop is seamless; the copy is hidden from screen readers
-    [0, 1].forEach((copy) => list.forEach((b) => {
+    [0, 1].forEach((copy) => items.forEach((f) => {
       const li = document.createElement("li");
       if (copy) li.setAttribute("aria-hidden", "true");
-      li.append(logoEl(b, files));
+      li.append(logoEl(f));
       row.append(li);
     }));
-  }
+  });
 
   document.querySelectorAll("[data-logo]").forEach((li) => {
-    const slug = li.dataset.logo;
-    const name = li.textContent.trim();
+    const f = bySlug.get(li.dataset.logo);
+    if (!f) return;
     li.textContent = "";
-    li.append(logoEl([name, slug], files));
+    li.append(logoEl(f));
   });
 }
 renderLogos();
 
-/* ════════════════ Reveal + counters ════════════════ */
-document.querySelectorAll(".service-grid, .reel-grid, .case-grid, .steps, .principles, .stats, .order-list").forEach((g) => {
-  [...g.querySelectorAll(".reveal")].forEach((el, i) => el.style.setProperty("--rd", `${Math.min(i, 6) * 0.07}s`));
+/* ════════════════ Text motion ════════════════ */
+document.querySelectorAll(".split").forEach((el) => {
+  let n = 0;
+  const walk = (node) => {
+    [...node.childNodes].forEach((c) => {
+      if (c.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.append(" "); return; }
+          const w = document.createElement("span");
+          w.className = "w";
+          const inner = document.createElement("span");
+          inner.textContent = part;
+          inner.style.setProperty("--d", `${n++ * 0.06}s`);
+          w.append(inner);
+          frag.append(w);
+        });
+        c.replaceWith(frag);
+      } else if (c.nodeType === 1) walk(c);
+    });
+  };
+  walk(el);
+});
+
+document.querySelectorAll(".channel-grid, .pillar-stack, .principles, .stats, .flow, .reel-grid, .case-grid, .ai-more").forEach((g) => {
+  [...g.querySelectorAll(".reveal")].forEach((el, i) => el.style.setProperty("--d", `${Math.min(i, 6) * 0.08}s`));
 });
 
 function countUp(el) {
   const end = parseFloat(el.dataset.count);
   const dec = parseInt(el.dataset.decimals || "0", 10);
   if (reduceMotion) return;
-  const t0 = performance.now(), dur = 1600;
+  const t0 = performance.now(), dur = 1800;
   const step = (now) => {
     const p = Math.min((now - t0) / dur, 1);
     el.textContent = (end * (1 - Math.pow(1 - p, 4))).toFixed(dec);
@@ -143,13 +133,80 @@ const io = new IntersectionObserver((entries) => {
   entries.forEach((e) => {
     if (!e.isIntersecting) return;
     e.target.classList.add("in");
-    e.target.querySelectorAll?.("[data-count]").forEach(countUp);
+    e.target.querySelectorAll("[data-count]").forEach(countUp);
     io.unobserve(e.target);
   });
-}, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
-document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+}, { rootMargin: "0px 0px -10% 0px", threshold: 0.12 });
+document.querySelectorAll(".reveal, .split:not(.display)").forEach((el) => io.observe(el));
 
-/* ════════════════ Cartoon snowball ════════════════ */
+/* Intro: nav drops, headline words rise, the rest follows, the ball pops in */
+let introStart = Infinity;
+document.querySelectorAll(".intro-item").forEach((el, i) => el.style.setProperty("--d", `${0.55 + i * 0.12}s`));
+const begin = () => {
+  root.classList.add("loaded");
+  document.querySelector(".display")?.classList.add("in");
+  introStart = performance.now() + 350;
+};
+Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 900))]).then(() => requestAnimationFrame(begin));
+
+/* ════════════════ Scroll UI ════════════════ */
+const nav = document.getElementById("nav");
+const railFill = document.querySelector(".rail-fill");
+const railBall = document.querySelector(".rail-ball");
+const momentum = document.getElementById("momentum");
+const orbitItems = [...document.querySelectorAll(".orbit-item")];
+const bgSections = [...document.querySelectorAll("[data-bg]")];
+let activeRing = -1;
+
+function onScroll() {
+  const max = root.scrollHeight - innerHeight;
+  const p = max > 0 ? Math.min(scrollY / max, 1) : 0;
+  nav.classList.toggle("scrolled", scrollY > 30);
+  railFill.style.height = `${p * 100}%`;
+  railBall.style.top = `${p * 100}%`;
+  const size = 7 + p * 11;
+  railBall.style.width = railBall.style.height = `${size}px`;
+  momentum.textContent = String(Math.round(p * 100)).padStart(3, "0");
+
+  // page colour follows whichever themed section holds the viewport centre
+  const mid = innerHeight / 2;
+  let bg = "";
+  bgSections.forEach((s) => { const r = s.getBoundingClientRect(); if (r.top < mid && r.bottom > mid) bg = s.dataset.bg; });
+  if ((root.dataset.bg || "") !== bg) { if (bg) root.dataset.bg = bg; else delete root.dataset.bg; }
+
+  // active channel in the belief list → its orbit ring lights up
+  let best = -1, bestD = Infinity;
+  orbitItems.forEach((el, i) => {
+    const r = el.getBoundingClientRect();
+    const d = Math.abs(r.top + r.height / 2 - mid);
+    if (d < bestD && r.bottom > 0 && r.top < innerHeight) { bestD = d; best = i; }
+  });
+  if (bestD > innerHeight * 0.35) best = -1;
+  if (best !== activeRing) {
+    activeRing = best;
+    orbitItems.forEach((el, i) => { el.classList.toggle("active", i === best); el.classList.toggle("seen", best >= 0 && i < best); });
+  }
+}
+addEventListener("scroll", onScroll, { passive: true });
+addEventListener("resize", onScroll);
+onScroll();
+
+document.querySelectorAll(".card").forEach((card) => {
+  card.addEventListener("pointermove", (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    card.style.setProperty("--my", `${e.clientY - r.top}px`);
+  });
+});
+
+/* ════════════════ 3D scene ════════════════ */
+const canvas = document.getElementById("scene");
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+} catch (e) { renderer = null; }
+if (renderer) initScene();
+
 function lumpyBall() {
   const geo = new THREE.IcosahedronGeometry(1, 7);
   const p = geo.attributes.position;
@@ -158,175 +215,299 @@ function lumpyBall() {
     v.fromBufferAttribute(p, i).normalize();
     const n = Math.sin(v.x * 5.1 + 1.3) * Math.sin(v.y * 4.3 + 0.7) * Math.sin(v.z * 5.7 + 2.1)
             + 0.5 * Math.sin(v.x * 11.0 + v.z * 7.0) * Math.sin(v.y * 9.0);
-    v.multiplyScalar(1 + n * 0.028);
+    v.multiplyScalar(1 + n * 0.018);
     p.setXYZ(i, v.x, v.y, v.z);
   }
   geo.computeVertexNormals();
   return geo;
 }
 
-const toonMaterial = () => new THREE.ShaderMaterial({
-  uniforms: { uLight: { value: new THREE.Vector3(-0.55, 0.75, 0.6).normalize() } },
-  vertexShader: /* glsl */ `
-    varying vec3 vN; varying vec3 vObj; varying vec3 vView;
-    void main() {
-      vObj = position;
-      vN = normalize(mat3(modelMatrix) * normal);
-      vec4 wp = modelMatrix * vec4(position, 1.0);
-      vView = normalize(cameraPosition - wp.xyz);
-      gl_Position = projectionMatrix * viewMatrix * wp;
-    }`,
-  fragmentShader: /* glsl */ `
-    uniform vec3 uLight;
-    varying vec3 vN; varying vec3 vObj; varying vec3 vView;
-    void main() {
-      float d = dot(normalize(vN), uLight);
-      vec3 white = vec3(1.0);
-      vec3 mid   = vec3(0.886, 0.918, 1.0);   // #e2eaff
-      vec3 shade = vec3(0.737, 0.800, 0.973); // #bcccf8
-      vec3 col = d > 0.42 ? white : (d > -0.12 ? mid : shade);
-      // a few soft snow clumps, fixed to the ball so you can see it roll
-      float clump = sin(vObj.x * 6.0) * sin(vObj.y * 5.0 + 1.0) * sin(vObj.z * 6.5 + 2.0);
-      col = mix(col, col * vec3(0.93, 0.95, 1.0), step(0.28, clump));
-      // glossy cartoon highlight
-      vec3 h = normalize(uLight + vView);
-      float spec = pow(max(dot(normalize(vN), h), 0.0), 60.0);
-      col = mix(col, vec3(1.0), step(0.6, spec));
-      gl_FragColor = vec4(col, 1.0);
-    }`,
-});
-
-function shadowTexture() {
-  const c = document.createElement("canvas");
-  c.width = c.height = 128;
-  const g = c.getContext("2d");
-  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0, "rgba(29,53,147,0.32)");
-  grd.addColorStop(0.55, "rgba(29,53,147,0.12)");
-  grd.addColorStop(1, "rgba(29,53,147,0)");
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 128, 128);
-  return new THREE.CanvasTexture(c);
-}
-
-/**
- * mode "hero": the ball hops and rolls in place and grows as you scroll the page.
- * mode "cta":  a big ball rises from the bottom of the closing section.
- */
-function createSnowball(canvas, mode) {
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  } catch (e) { return; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+function initScene() {
+  const DPR = Math.min(devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(DPR);
   renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  camera.position.set(0, 0.4, 8);
-  camera.lookAt(0, 0, 0);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(0, 0, 12);
+  const HALF_H = Math.tan(THREE.MathUtils.degToRad(15)) * 12;
 
+  const INK = new THREE.Color(0x0a1330);
+  const BLUE = new THREE.Color(0x3462fc);
+
+  /* Ball: toon-shaded snow with an ink outline */
   const geo = lumpyBall();
-  const ball = new THREE.Group();
-  const body = new THREE.Mesh(geo, toonMaterial());
-  const outline = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x0a1330, side: THREE.BackSide }));
-  outline.scale.setScalar(1.04);
-  const spinner = new THREE.Group();
+  const ballMat = new THREE.ShaderMaterial({
+    uniforms: { uLight: { value: new THREE.Vector3(-0.55, 0.75, 0.6).normalize() } },
+    vertexShader: /* glsl */ `
+      varying vec3 vN; varying vec3 vObj; varying vec3 vView;
+      void main() {
+        vObj = position;
+        vN = normalize(mat3(modelMatrix) * normal);
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vView = normalize(cameraPosition - wp.xyz);
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uLight;
+      varying vec3 vN; varying vec3 vObj; varying vec3 vView;
+      void main() {
+        vec3 n = normalize(vN);
+        float d = dot(n, uLight);
+        vec3 col = d > 0.42 ? vec3(1.0) : (d > -0.12 ? vec3(0.886, 0.918, 1.0) : vec3(0.737, 0.800, 0.973));
+        float clump = sin(vObj.x * 6.0) * sin(vObj.y * 5.0 + 1.0) * sin(vObj.z * 6.5 + 2.0);
+        col = mix(col, col * vec3(0.93, 0.95, 1.0), step(0.28, clump));
+        float spec = pow(max(dot(n, normalize(uLight + vView)), 0.0), 60.0);
+        col = mix(col, vec3(1.0), step(0.6, spec));
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+  });
+  const root3 = new THREE.Group();        // follows the keyframes
+  const ball = new THREE.Group();         // scaled to the ball radius
+  const spinner = new THREE.Group();      // rolls
+  const body = new THREE.Mesh(geo, ballMat);
+  const outline = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide }));
   spinner.add(body, outline);
   ball.add(spinner);
-  scene.add(ball);
+  root3.add(ball);
+  scene.add(root3);
 
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false })
-  );
-  shadow.rotation.x = -Math.PI / 2;
-  scene.add(shadow);
+  /* Soft contact shadow */
+  const sc = document.createElement("canvas");
+  sc.width = sc.height = 128;
+  const g = sc.getContext("2d");
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0, "rgba(31,59,179,0.28)");
+  grd.addColorStop(0.6, "rgba(31,59,179,0.08)");
+  grd.addColorStop(1, "rgba(31,59,179,0)");
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+  shadow.renderOrder = -1;
+  root3.add(shadow);
 
-  // a few loose flakes that orbit lazily
-  const flakes = [];
-  const flakeGeo = new THREE.CircleGeometry(0.05, 16);
-  const flakeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  const flakeLine = new THREE.MeshBasicMaterial({ color: 0x0a1330 });
-  if (mode === "hero") {
-    for (let i = 0; i < 5; i++) {
-      const f = new THREE.Group();
-      const dot = new THREE.Mesh(flakeGeo, flakeMat);
-      const ring = new THREE.Mesh(new THREE.CircleGeometry(0.068, 16), flakeLine);
-      ring.position.z = -0.001;
-      f.add(ring, dot);
-      f.userData = { a: (i / 5) * Math.PI * 2, r: 1.55 + (i % 2) * 0.35, y: -0.2 + i * 0.22, s: 0.6 + i * 0.12 };
-      scene.add(f);
-      flakes.push(f);
-    }
+  /* Channel orbit rings (lit by the belief list) */
+  const rings = new THREE.Group();
+  root3.add(rings);
+  const ringData = [];
+  for (let i = 0; i < 7; i++) {
+    const R = 1.55 + i * 0.3;
+    const mat = new THREE.MeshBasicMaterial({ color: INK.clone(), transparent: true, opacity: 0, depthWrite: false });
+    const torus = new THREE.Mesh(new THREE.TorusGeometry(R, i === 0 ? 0.016 : 0.011, 6, 180), mat);
+    const pivot = new THREE.Group();
+    pivot.rotation.set(1.2 + (i % 2 ? 0.2 : -0.16) + i * 0.03, 0, (i - 3) * 0.12);
+    pivot.add(torus);
+    const satMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+    const satLine = new THREE.MeshBasicMaterial({ color: INK, transparent: true, opacity: 0, side: THREE.BackSide });
+    const satGeo = new THREE.SphereGeometry(i === 0 ? 0.11 : 0.08, 16, 12);
+    const sat = new THREE.Group();
+    const satOut = new THREE.Mesh(satGeo, satLine);
+    satOut.scale.setScalar(1.3);
+    sat.add(new THREE.Mesh(satGeo, satMat), satOut);
+    pivot.add(sat);
+    rings.add(pivot);
+    ringData.push({ R, mat, satMat, satLine, sat, pivot, speed: 0.4 / (1 + i * 0.35), phase: Math.random() * 6.28, hl: 0 });
   }
 
-  let visible = true, w = 1, h = 1;
-  const resize = () => {
-    const r = canvas.getBoundingClientRect();
-    w = Math.max(1, r.width); h = Math.max(1, r.height);
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+  /* Loose flakes that drift around and get absorbed as the ball grows */
+  const COUNT = isNarrow() ? 34 : 56;
+  const start = new Float32Array(COUNT * 3);
+  const dir = new Float32Array(COUNT * 3);
+  const delay = new Float32Array(COUNT);
+  const size = new Float32Array(COUNT);
+  const seed = new Float32Array(COUNT);
+  for (let i = 0; i < COUNT; i++) {
+    // start positions in ball radii, so the flakes hug the ball at any size
+    const r = 1.5 + Math.random() * 1.6;
+    const a = Math.random() * Math.PI * 2;
+    start[i * 3] = Math.cos(a) * r;
+    start[i * 3 + 1] = (Math.random() - 0.5) * 2.2;
+    start[i * 3 + 2] = Math.sin(a) * r * 0.5;
+    const v = new THREE.Vector3().randomDirection();
+    dir.set([v.x, v.y, v.z], i * 3);
+    delay[i] = Math.random();
+    size[i] = 7 + Math.pow(Math.random(), 2) * 7;
+    seed[i] = Math.random();
+  }
+  const fGeo = new THREE.BufferGeometry();
+  fGeo.setAttribute("position", new THREE.BufferAttribute(start, 3));
+  fGeo.setAttribute("aDir", new THREE.BufferAttribute(dir, 3));
+  fGeo.setAttribute("aDelay", new THREE.BufferAttribute(delay, 1));
+  fGeo.setAttribute("aSize", new THREE.BufferAttribute(size, 1));
+  fGeo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
+  const fUniforms = {
+    uTime: { value: 0 }, uAcc: { value: 0 }, uR: { value: 1 }, uPR: { value: DPR },
+    uFade: { value: 0 }, uSpin: { value: new THREE.Matrix3() },
   };
-  new ResizeObserver(resize).observe(canvas);
+  const flakes = new THREE.Points(fGeo, new THREE.ShaderMaterial({
+    uniforms: fUniforms, transparent: true, depthWrite: false,
+    vertexShader: /* glsl */ `
+      attribute vec3 aDir; attribute float aDelay; attribute float aSize; attribute float aSeed;
+      uniform float uTime, uAcc, uR, uPR, uFade; uniform mat3 uSpin;
+      varying float vAlpha;
+      void main() {
+        float d = aDelay * 0.62;
+        float t = smoothstep(d, d + 0.1, uAcc);
+        float e = t * t * (3.0 - 2.0 * t);
+        float ang = uTime * (0.05 + aSeed * 0.07) + aSeed * 6.28;
+        vec3 s = position * uR;
+        float c = cos(ang), sn = sin(ang);
+        s.xz = mat2(c, -sn, sn, c) * s.xz;
+        s.y += sin(uTime * (0.6 + aSeed) + aSeed * 12.0) * 0.12 * uR;
+        vec3 home = uSpin * aDir * uR;
+        vec3 p = mix(s, home, e);
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        gl_Position = projectionMatrix * mv;
+        gl_PointSize = aSize * uPR * (1.0 - e * 0.6);
+        vAlpha = (1.0 - smoothstep(0.8, 1.0, e)) * uFade;
+      }`,
+    fragmentShader: /* glsl */ `
+      varying float vAlpha;
+      void main() {
+        float r = length(gl_PointCoord - 0.5);
+        if (r > 0.5) discard;
+        vec3 col = r > 0.36 ? vec3(0.039, 0.075, 0.188) : vec3(1.0);
+        float edge = smoothstep(0.5, 0.46, r);
+        gl_FragColor = vec4(col, vAlpha * edge);
+      }`,
+  }));
+  flakes.frustumCulled = false;
+  root3.add(flakes);
+
+  /* ───────── Scroll → keyframe state ───────── */
+  const sections = [...document.querySelectorAll("[data-scene]")];
+  let anchors = [];
+  const keyFor = (name) => {
+    const k = { ...KEYS[name] };
+    if (isNarrow()) {
+      // phones: tuck the ball into a top corner, half off-screen, clear of the text
+      k.x = k.mx ?? (k.x >= 0 ? 0.95 : -0.95);
+      k.y = k.my ?? 0.64;
+      k.s = name === "cta" ? k.s : Math.min(k.s * 0.95, 0.34);
+    }
+    return k;
+  };
+  const measure = () => {
+    anchors = sections.map((el) => {
+      const r = el.getBoundingClientRect();
+      const top = r.top + scrollY;
+      const at = top + Math.min(r.height, innerHeight * 1.6) / 2 - innerHeight / 2;
+      return { key: keyFor(el.dataset.scene), at: Math.max(0, at) };
+    });
+    anchors[0].at = 0;
+    const last = anchors[anchors.length - 1];
+    last.at = Math.min(last.at, root.scrollHeight - innerHeight);
+  };
+  const target = {}, state = {};
+  const sample = () => {
+    const y = scrollY;
+    let i = 0;
+    while (i < anchors.length - 1 && y > anchors[i + 1].at) i++;
+    const a = anchors[i], b = anchors[Math.min(i + 1, anchors.length - 1)];
+    let t = a === b ? 0 : THREE.MathUtils.clamp((y - a.at) / Math.max(1, b.at - a.at), 0, 1);
+    t = t * t * (3 - 2 * t);
+    for (const f of FIELDS) target[f] = a.key[f] + (b.key[f] - a.key[f]) * t;
+  };
+
+  let halfW = 1;
+  const resize = () => {
+    renderer.setSize(innerWidth, innerHeight, false);
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    halfW = HALF_H * camera.aspect;
+    measure();
+  };
+  addEventListener("resize", resize);
+  document.fonts?.ready.then(measure);
+  addEventListener("load", measure);
+  new ResizeObserver(measure).observe(document.body);
   resize();
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
+  sample();
+  Object.assign(state, target);
 
-  const pointer = { x: 0, tx: 0 };
-  addEventListener("pointermove", (e) => { pointer.tx = (e.clientX / innerWidth - 0.5) * 2; }, { passive: true });
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    pointer.tx = (e.clientX / innerWidth - 0.5) * 2;
+    pointer.ty = (e.clientY / innerHeight - 0.5) * 2;
+  }, { passive: true });
 
-  let lastY = scrollY, roll = 0, vel = 0;
+  const tag = document.getElementById("ball-tag");
+  const tmp = new THREE.Vector3();
   const clock = new THREE.Clock();
+  let roll = 0, lastY = scrollY, vel = 0, visible = true;
+  document.addEventListener("visibilitychange", () => (visible = !document.hidden));
 
   const tick = () => {
     requestAnimationFrame(tick);
-    const dt = Math.min(clock.getDelta(), 0.05);
     if (!visible) return;
-    const t = clock.elapsedTime;
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const time = clock.elapsedTime;
+
+    sample();
+    const k = 1 - Math.pow(0.002, dt);
+    for (const f of FIELDS) state[f] += (target[f] - state[f]) * k;
+
+    // intro pop: elastic scale-in once the page has loaded
+    const it = THREE.MathUtils.clamp((performance.now() - introStart) / 1100, 0, 1);
+    const pop = reduceMotion ? (it > 0 ? 1 : 0) : (it === 0 ? 0 : 1 - Math.pow(2, -9 * it) * Math.cos(it * 9.5));
 
     const sy = scrollY;
-    const dy = sy - lastY;
+    vel += (THREE.MathUtils.clamp((sy - lastY) / 30, -2, 2) - vel) * 0.1;
     lastY = sy;
-    vel += (THREE.MathUtils.clamp(dy / 40, -1.5, 1.5) - vel) * 0.12;
-    roll += dt * (reduceMotion ? 0.15 : 0.6) + vel * 0.18;
-    pointer.x += (pointer.tx - pointer.x) * 0.05;
+    roll += dt * (reduceMotion ? 0.12 : 0.45) + vel * 0.06;
 
-    const narrow = w / h < 1.1;
-    if (mode === "hero") {
-      const doc = document.documentElement.scrollHeight - innerHeight;
-      const grow = 1 + Math.min(sy / Math.max(doc, 1), 1) * 0.35;
-      const base = (narrow ? 0.72 : 1.05) * grow;
-      const floor = narrow ? 0.3 : -0.15;
-      // cartoon hop: |sin| bounce with squash on landing
-      const hop = reduceMotion ? 0 : Math.abs(Math.sin(t * 2.4));
-      const squash = reduceMotion ? 1 : 1 - Math.pow(1 - hop, 6) * 0.12;
-      const lift = hop * 0.28;
-      ball.position.set(narrow ? 0.4 : 0.35 + pointer.x * 0.12, floor + lift * base, 0);
-      ball.scale.set(base * (2 - squash), base * squash, base * (2 - squash));
-      shadow.position.set(ball.position.x, floor - base * 1.02, 0);
-      shadow.scale.set(base * 2.6 * (1.1 - hop * 0.25), base * 1.1, 1);
-      flakes.forEach((f) => {
-        const u = f.userData;
-        const a = u.a + t * 0.35 * u.s;
-        f.position.set(ball.position.x + Math.cos(a) * u.r * base, u.y + Math.sin(t * u.s + u.a) * 0.15, Math.sin(a) * u.r * 0.6);
-        f.scale.setScalar(Math.sin(a) > 0 ? 1 : 0.7);
-        f.lookAt(camera.position);
-      });
-    } else {
-      const base = narrow ? 1.25 : 1.9;
-      ball.position.set(pointer.x * 0.15, -2.2, 0);
-      ball.scale.setScalar(base);
-      shadow.visible = false;
-    }
+    const unit = Math.min(HALF_H, halfW * 1.25);
+    const R = Math.max(0.0001, state.s * unit * pop);
+    const bob = reduceMotion ? 0 : Math.sin(time * 1.6) * 0.04 * R;
+    root3.position.set(state.x * halfW, state.y * HALF_H + bob, 0);
+    ball.scale.setScalar(R);
+    outline.scale.setScalar(1 + 0.045 / Math.max(R, 0.05));
     spinner.rotation.z = -roll;
     spinner.rotation.x = roll * 0.35;
+
+    shadow.position.set(0, -R * 1.18 - bob, -R);
+    shadow.scale.set(R * 2.4, R * 0.55, 1);
+    shadow.material.opacity = root.dataset.bg ? 0 : 1;
+
+    fUniforms.uTime.value = time;
+    fUniforms.uAcc.value = state.acc;
+    fUniforms.uR.value = R;
+    fUniforms.uFade.value = Math.min(pop, 1);
+    spinner.updateMatrixWorld();
+    fUniforms.uSpin.value.setFromMatrix4(spinner.matrixWorld).multiplyScalar(1 / R);
+
+    rings.scale.setScalar(R);
+    rings.rotation.x = 0.3;
+    ringData.forEach((r, i) => {
+      r.hl += ((i === activeRing ? 1 : 0) - r.hl) * 0.08;
+      const base = state.rings * (i === 0 ? 0.55 : 0.3);
+      r.mat.opacity = base + r.hl * state.rings * 0.45;
+      r.mat.color.copy(INK).lerp(BLUE, r.hl);
+      const a = r.phase + time * r.speed;
+      r.sat.position.set(Math.cos(a) * r.R, Math.sin(a) * r.R, 0);
+      r.satMat.opacity = r.satLine.opacity = state.rings;
+      r.sat.scale.setScalar(1 + r.hl * 0.8);
+      r.pivot.rotation.y = time * 0.02 * (i % 2 ? 1 : -1);
+    });
+
+    pointer.x += (pointer.tx - pointer.x) * 0.04;
+    pointer.y += (pointer.ty - pointer.y) * 0.04;
+    camera.position.x = pointer.x * 0.25;
+    camera.position.y = -pointer.y * 0.18;
+    camera.lookAt(0, 0, 0);
+
+    // label that rides next to the ball while it is still small
+    const heroP = THREE.MathUtils.clamp(1 - sy / (innerHeight * 0.45), 0, 1);
+    tmp.copy(root3.position).project(camera);
+    const px = (tmp.x * 0.5 + 0.5) * innerWidth;
+    const py = (-tmp.y * 0.5 + 0.5) * innerHeight;
+    const rpx = (R / HALF_H) * (innerHeight / 2);
+    const tx = isNarrow() ? px - tag.offsetWidth - rpx * 0.6 : px + rpx * 0.75;
+    tag.style.transform = `translate(${Math.round(tx)}px, ${Math.round(py - rpx * 1.35)}px)`;
+    tag.style.opacity = String(heroP * (it >= 1 ? 1 : 0));
+
     renderer.render(scene, camera);
   };
   tick();
 }
-
-const heroCanvas = document.getElementById("snow-hero");
-const ctaCanvas = document.getElementById("snow-cta");
-if (heroCanvas) createSnowball(heroCanvas, "hero");
-if (ctaCanvas) createSnowball(ctaCanvas, "cta");
