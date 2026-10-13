@@ -62,16 +62,21 @@ const ROW_B = [
   ["Buy Me a Coffee", "buymeacoffee"], ["Quizizz", "quizizz"], ["smallcase", "smallcase"], ["Glance", "glance"],
 ];
 
+// symbols that flatten into a solid blob in monochrome read better as plain names
+const NAME_ONLY = new Set(["phonepe", "sharechat", "makemytrip"]);
+// stacked or fine-print wordmarks need more height to stay legible
+const TALL = new Set(["esteelauder", "hdfclife", "warnermusic", "hotstar", "cred", "tatacommunications"]);
+
 function logoEl([name, slug], files) {
   const span = document.createElement("span");
-  const f = files.get(slug);
+  const f = NAME_ONLY.has(slug) ? null : files.get(slug);
   if (!f) {
     span.className = "logo";
     span.innerHTML = `<span class="logo-name"></span>`;
     span.firstChild.textContent = name;
     return span;
   }
-  span.className = `logo ${f.kind === "symbol" ? "symbol" : ""}`;
+  span.className = `logo ${f.kind === "symbol" ? "symbol" : ""} ${TALL.has(slug) ? "tall" : ""}`;
   const img = new Image();
   img.src = `assets/logos/${f.file}`;
   img.alt = name;

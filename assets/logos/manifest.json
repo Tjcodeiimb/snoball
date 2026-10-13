@@ -1,0 +1,200 @@
+[
+  {
+    "name": "Apple",
+    "file": "apple.svg",
+    "kind": "symbol",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/apple.svg"
+  },
+  {
+    "name": "Emergent",
+    "file": "emergent.svg",
+    "kind": "wordmark",
+    "source": "https://cdn.prod.website-files.com/6a0edf12ef1a8562ed56d806/6a0ef94db7f0a045fab57060_logo.svg"
+  },
+  {
+    "name": "Wispr Flow",
+    "file": "wisprflow.svg",
+    "kind": "wordmark",
+    "source": "https://cdn.prod.website-files.com/682f84b3838c89f8ff7667db/683215c6f233131a07d8bafc_navbar_logo.svg"
+  },
+  {
+    "name": "OpenAI",
+    "file": "openai.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/af/OpenAI_logo_2025_(wordmark).svg"
+  },
+  {
+    "name": "Replit",
+    "file": "replit.svg",
+    "kind": "wordmark",
+    "source": "https://replit.com (inline header SVG)"
+  },
+  {
+    "name": "Gamma",
+    "file": "gamma.svg",
+    "kind": "wordmark",
+    "source": "https://gamma.app (inline header SVG)"
+  },
+  {
+    "name": "Higgsfield AI",
+    "file": "higgsfield.svg",
+    "kind": "symbol",
+    "source": "https://higgsfield.ai (inline header SVG)"
+  },
+  {
+    "name": "Amazon",
+    "file": "amazon.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+  },
+  {
+    "name": "Flipkart",
+    "file": "flipkart.svg",
+    "kind": "wordmark",
+    "source": "https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/fkheaderlogo_exploreplus-44005d.svg (Explore Plus sub-line removed)"
+  },
+  {
+    "name": "Disney+ Hotstar",
+    "file": "hotstar.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney+_Hotstar_logo.svg"
+  },
+  {
+    "name": "Swiggy",
+    "file": "swiggy.svg",
+    "kind": "symbol",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/swiggy.svg"
+  },
+  {
+    "name": "Zomato",
+    "file": "zomato.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Zomato_Logo.svg"
+  },
+  {
+    "name": "Zepto",
+    "file": "zepto.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/8/81/Zepto_Logo.svg"
+  },
+  {
+    "name": "Paytm",
+    "file": "paytm.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_(standalone).svg"
+  },
+  {
+    "name": "PhonePe",
+    "file": "phonepe.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg"
+  },
+  {
+    "name": "Razorpay",
+    "file": "razorpay.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg"
+  },
+  {
+    "name": "CRED",
+    "file": "cred.svg",
+    "kind": "wordmark",
+    "source": "https://cred.club (inline navbar SVG)"
+  },
+  {
+    "name": "HP",
+    "file": "hp.svg",
+    "kind": "symbol",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/hp.svg"
+  },
+  {
+    "name": "Air India",
+    "file": "airindia.svg",
+    "kind": "symbol",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/airindia.svg"
+  },
+  {
+    "name": "Estée Lauder",
+    "file": "esteelauder.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/03/Estée_Lauder_Companies_logo.svg"
+  },
+  {
+    "name": "Clinique",
+    "file": "clinique.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/45/Clinique_logo.svg"
+  },
+  {
+    "name": "Warner Music Group",
+    "file": "warnermusic.svg",
+    "kind": "wordmark",
+    "source": "https://www.wmg.com/wp-content/themes/wmg/img/svg/defs.svg#WMG_Logo"
+  },
+  {
+    "name": "Tata Communications",
+    "file": "tatacommunications.svg",
+    "kind": "wordmark",
+    "source": "https://www.tatacommunications.com/hubfs/Tata-Communications/Logos/Tata%20Communications%20Logo%20White.svg"
+  },
+  {
+    "name": "boAt",
+    "file": "boat.svg",
+    "kind": "wordmark",
+    "source": "https://cdn.shopify.com/s/files/1/0057/8938/4802/files/boAt_logo_black_830768d4-b3b0-4bef-8d5c-494df9bd6cbc.svg"
+  },
+  {
+    "name": "ACKO",
+    "file": "acko.svg",
+    "kind": "wordmark",
+    "source": "https://acko-cms.ackoassets.com/White_Acko_logo_f520681d98.svg"
+  },
+  {
+    "name": "Godrej",
+    "file": "godrej.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/9/97/Godrej_Logo.svg"
+  },
+  {
+    "name": "MakeMyTrip",
+    "file": "makemytrip.svg",
+    "kind": "wordmark",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/61/Makemytrip_logo.svg"
+  },
+  {
+    "name": "Unacademy",
+    "file": "unacademy.svg",
+    "kind": "wordmark",
+    "source": "https://unacademy.com/static/images/logo.svg"
+  },
+  {
+    "name": "InMobi",
+    "file": "inmobi.svg",
+    "kind": "wordmark",
+    "source": "https://web.inmobicdn.net/website/website/6.0.1/inmobi-main-images/InMobi-logo.svg"
+  },
+  {
+    "name": "ShareChat",
+    "file": "sharechat.svg",
+    "kind": "symbol",
+    "source": "https://sharechat.com (inline header SVG)"
+  },
+  {
+    "name": "The Ordinary",
+    "file": "theordinary.svg",
+    "kind": "wordmark",
+    "source": "https://theordinary.com/on/demandware.static/-/Library-Sites-DeciemSharedLibrary/default/dw4ee7d800/theordinary/logo.svg (tagline removed)"
+  },
+  {
+    "name": "HDFC Life",
+    "file": "hdfclife.svg",
+    "kind": "wordmark",
+    "source": "https://www.hdfclife.com/hdfc-careers/img/logo.svg"
+  },
+  {
+    "name": "Buy Me a Coffee",
+    "file": "buymeacoffee.svg",
+    "kind": "symbol",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/buymeacoffee.svg"
+  }
+]
