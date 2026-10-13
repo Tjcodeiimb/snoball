@@ -4,214 +4,328 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Snoball — AI launches that get talked about</title>
-  <meta name="description" content="Snoball helps AI companies launch, scale, and get talked about. An Owled brand for AI and tech launches and growth marketing." />
-  <meta name="theme-color" content="#04060b" />
+  <meta name="description" content="Snoball helps AI companies launch, scale, and get talked about. An Owled brand for AI and tech launches, creator campaigns and launch videos." />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:title" content="Snoball — AI launches that get talked about" />
+  <meta property="og:description" content="We start where tech conversations actually happen. Launch videos, launch amplification and creator campaigns for AI companies." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%23fff' stroke='%230a1330' stroke-width='5'/%3E%3Cpath d='M18 40c6 6 22 6 28 0' fill='none' stroke='%23b9c9f7' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Intro gate: play the entrance only on a fresh visit (same rules as upforgeconsulting.com) -->
+  <script>
+    (function () {
+      var html = document.documentElement;
+      html.classList.add('js');
+      var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+      var type = nav ? nav.type : 'navigate';
+      var internal = false;
+      try { internal = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+      var fresh = type === 'reload' || (type === 'navigate' && !internal);
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!fresh || reduce || location.hash) return;
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+      html.classList.add('hero-anim', 'intro-lock');
+      // safety net: never leave the page locked
+      setTimeout(function () { html.classList.add('intro-done', 'nav-in', 'hero-in'); html.classList.remove('intro-lock'); }, 5500);
+    })();
+  </script>
   <script type="importmap">
     { "imports": { "three": "./vendor/three.module.min.js" } }
   </script>
 </head>
 <body>
-  <canvas id="scene" aria-hidden="true"></canvas>
-  <div class="vignette" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
 
-  <!-- Navigation -->
-  <header class="nav">
+  <!-- ───────── Nav ───────── -->
+  <header class="nav" id="nav">
     <a href="#top" class="brand" aria-label="Snoball home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-ball" aria-hidden="true"></span>
       <span class="brand-word">snoball</span>
     </a>
     <nav class="nav-links" aria-label="Sections">
-      <a href="#belief">Where</a>
-      <a href="#pillars">How</a>
-      <a href="#channels">Channels</a>
+      <a href="#clients">Clients</a>
+      <a href="#work">Work</a>
+      <a href="#how">How we launch</a>
       <a href="#scale">Scale</a>
     </nav>
-    <a href="#start" class="btn btn-ghost nav-cta">Start a launch</a>
+    <a href="#start" class="btn btn-blue nav-cta">Book a launch call</a>
   </header>
-
-  <!-- Momentum rail -->
-  <aside class="rail" aria-hidden="true">
-    <span class="rail-label">Momentum</span>
-    <div class="rail-track"><div class="rail-fill"></div><div class="rail-ball"></div></div>
-    <span class="rail-value"><span id="momentum">000</span>%</span>
-  </aside>
 
   <main id="top">
 
-    <!-- 01 Hero -->
-    <section class="section hero" id="hero" data-scene="hero">
-      <div class="wrap">
-        <p class="eyebrow reveal"><span class="dot"></span> AI &amp; tech launches · an Owled brand</p>
-        <h1 class="display split">
-          <span class="line">Launch.</span>
-          <span class="line">Scale.</span>
-          <span class="line"><em>Get talked about.</em></span>
-        </h1>
-        <p class="lede reveal">Snoball helps AI companies launch, scale, and get talked about — starting where tech conversations actually happen.</p>
-        <div class="hero-actions reveal">
-          <a href="#start" class="btn btn-solid">Plan your launch <span aria-hidden="true">↓</span></a>
-          <a href="#belief" class="btn btn-ghost">See how it rolls</a>
-        </div>
-      </div>
-      <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><i></i></div>
-    </section>
-
-    <!-- 02 Belief + channel order -->
-    <section class="section belief" id="belief" data-scene="belief">
-      <div class="wrap belief-grid">
-        <div class="belief-head">
-          <div class="sticky">
-            <p class="kicker reveal">01 — Core belief</p>
-            <h2 class="h2 split">We start where tech conversations <em>actually happen.</em></h2>
-            <p class="body reveal">Not where a media plan says they should. Every launch begins on X, then rolls outward — gathering mass with each channel it touches.</p>
+    <!-- ───────── 1. Hero bento ───────── -->
+    <section class="hero" aria-label="Introduction">
+      <div class="bento">
+        <div class="card card-headline" style="--d:0s">
+          <p class="eyebrow eyebrow-light"><span class="dot"></span>AI &amp; tech launches · an Owled brand</p>
+          <h1 class="display">Launch, scale and <em>get talked about.</em></h1>
+          <p class="hero-sub">We help AI companies launch where tech conversations actually happen, starting with X and rolling out to every feed that matters.</p>
+          <div class="hero-actions">
+            <a href="#start" class="btn btn-white">Book a launch call <span aria-hidden="true">→</span></a>
+            <a href="#work" class="btn btn-ghost-light">See our work</a>
           </div>
         </div>
-        <ol class="orbit-list" aria-label="Channel order">
-          <li class="orbit-item" data-ring="0"><span class="oi-n">01</span><span class="oi-t">X / Twitter</span><span class="oi-tag">Day zero</span></li>
-          <li class="orbit-item" data-ring="1"><span class="oi-n">02</span><span class="oi-t">LinkedIn</span><span class="oi-tag">Credibility</span></li>
-          <li class="orbit-item" data-ring="2"><span class="oi-n">03</span><span class="oi-t">YouTube</span><span class="oi-tag">Depth</span></li>
-          <li class="orbit-item" data-ring="3"><span class="oi-n">04</span><span class="oi-t">Instagram</span><span class="oi-tag">Reach</span></li>
-          <li class="orbit-item" data-ring="4"><span class="oi-n">05</span><span class="oi-t">Reddit</span><span class="oi-tag">Scrutiny</span></li>
-          <li class="orbit-item" data-ring="5"><span class="oi-n">06</span><span class="oi-t">Newsletters</span><span class="oi-tag">Habit</span></li>
-          <li class="orbit-item" data-ring="6"><span class="oi-n">07</span><span class="oi-t">Private communities</span><span class="oi-tag">Trust</span></li>
+
+        <div class="card card-snow" style="--d:0.12s">
+          <canvas class="snow-canvas" id="snow-hero" aria-hidden="true"></canvas>
+          <p class="snow-caption">Every launch starts small.<br /><em>We make it roll.</em></p>
+        </div>
+
+        <div class="card card-stat" style="--d:0.22s">
+          <span class="card-label">Across launch campaigns</span>
+          <b class="stat-big"><span data-count="1.6" data-decimals="1">1.6</span>Bn</b>
+          <span class="stat-sub">views</span>
+        </div>
+
+        <div class="card card-ladder" style="--d:0.3s">
+          <span class="card-label card-label-dark">Where a launch starts</span>
+          <ol class="ladder">
+            <li><span>01</span>X / Twitter</li>
+            <li><span>02</span>LinkedIn</li>
+            <li><span>03</span>YouTube</li>
+            <li><span>04</span>Instagram, Reddit &amp; more</li>
+          </ol>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ───────── 2. Clients ───────── -->
+    <section class="section clients" id="clients" aria-labelledby="clients-h">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="kicker">Clients</p>
+          <h2 class="h2" id="clients-h">The brands that <em>trust us.</em></h2>
+        </div>
+        <ul class="logo-top" id="logo-top" aria-label="Featured clients"></ul>
+        <div class="marquee" aria-label="More clients">
+          <ul class="marquee-row" id="logo-row-a"></ul>
+          <ul class="marquee-row reverse" id="logo-row-b"></ul>
+        </div>
+        <p class="clients-note">Plus 80+ more across AI, fintech, consumer and media.</p>
+      </div>
+    </section>
+
+    <!-- ───────── 3. Belief ───────── -->
+    <section class="section belief" id="belief" aria-labelledby="belief-h">
+      <div class="wrap belief-grid">
+        <div class="belief-copy">
+          <p class="kicker">What we believe</p>
+          <h2 class="h2" id="belief-h">We start where tech conversations <em>actually happen.</em></h2>
+          <p class="body">Not where a media plan says they should. An AI launch earns attention on X first, then builds trust everywhere your buyers already scroll.</p>
+        </div>
+        <ol class="order-list" aria-label="Channel order">
+          <li class="reveal"><span class="ol-n">01</span><span class="ol-t">X / Twitter</span><span class="ol-tag">Day zero</span></li>
+          <li class="reveal"><span class="ol-n">02</span><span class="ol-t">LinkedIn</span><span class="ol-tag">Credibility</span></li>
+          <li class="reveal"><span class="ol-n">03</span><span class="ol-t">YouTube</span><span class="ol-tag">Depth</span></li>
+          <li class="reveal"><span class="ol-n">04</span><span class="ol-t">Instagram</span><span class="ol-tag">Reach</span></li>
+          <li class="reveal"><span class="ol-n">05</span><span class="ol-t">Reddit</span><span class="ol-tag">Scrutiny</span></li>
+          <li class="reveal"><span class="ol-n">06</span><span class="ol-t">Newsletters</span><span class="ol-tag">Habit</span></li>
+          <li class="reveal"><span class="ol-n">07</span><span class="ol-t">Private communities</span><span class="ol-tag">Trust</span></li>
         </ol>
       </div>
     </section>
 
-    <!-- 03 Model -->
-    <section class="section model" id="model" data-scene="model">
+    <!-- ───────── 4. Services ───────── -->
+    <section class="section services" id="services" aria-labelledby="services-h">
       <div class="wrap">
-        <p class="kicker reveal">02 — The model</p>
-        <h2 class="h2 split narrow">The people your market already listens to, <em>paired with launch videos.</em></h2>
-        <div class="flow">
-          <div class="flow-col reveal">
-            <span class="flow-label">Who we work with</span>
-            <ul class="chips">
-              <li>AI founders</li><li>Creators</li><li>Thought leaders</li>
-            </ul>
+        <div class="section-head">
+          <p class="kicker">What we do</p>
+          <h2 class="h2" id="services-h">Three ways we get you <em>talked about.</em></h2>
+        </div>
+        <div class="service-grid">
+          <article class="service reveal">
+            <span class="service-tag">Show your product clearly</span>
+            <h3>Launch videos</h3>
+            <p>Made in Owled’s own studios by the team that runs 50+ in-house pages, built to explain your product in the first few seconds.</p>
+          </article>
+          <article class="service reveal">
+            <span class="service-tag">Spread the word on social</span>
+            <h3>Launch amplification</h3>
+            <p>Coordinated waves on launch day across X, LinkedIn and our 50+ in-house pages, so it looks like the whole internet noticed at once.</p>
+          </article>
+          <article class="service reveal">
+            <span class="service-tag">Reach the right people</span>
+            <h3>Creator campaigns</h3>
+            <p>AI founders, creators and thought leaders your buyers already trust, matched to the audience you actually need.</p>
+          </article>
+        </div>
+        <div class="surfaces reveal">
+          <span class="surfaces-label">Where it runs</span>
+          <ul class="chips">
+            <li>Influencers on LinkedIn, YouTube &amp; Instagram</li>
+            <li>WhatsApp groups of AI operators, builders &amp; VCs</li>
+            <li>Reddit</li>
+            <li>Founder &amp; company LinkedIn</li>
+            <li>Niche YouTube channels</li>
+            <li>Newsletter integrations</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── 5. AI work ───────── -->
+    <section class="section work" id="work" aria-labelledby="work-h">
+      <div class="wrap">
+        <div class="section-head split-head">
+          <div>
+            <p class="kicker">Past work · AI launches</p>
+            <h2 class="h2" id="work-h">AI products we’ve made <em>noise for.</em></h2>
           </div>
-          <div class="flow-arrow reveal" aria-hidden="true"><i></i></div>
-          <div class="flow-col reveal">
-            <span class="flow-label">What compounds</span>
-            <ol class="stages">
-              <li><b>Awareness</b><span>They hear about you</span></li>
-              <li><b>Trust</b><span>They hear it from someone they believe</span></li>
-              <li><b>Adoption</b><span>They try it</span></li>
-            </ol>
-          </div>
+          <p class="body">Creator-led reels that explain the product in the first three seconds, then let someone the audience trusts deliver the verdict.</p>
         </div>
-      </div>
-    </section>
-
-    <!-- 04 Pillars -->
-    <section class="section pillars" id="pillars" data-scene="pillars">
-      <div class="wrap">
-        <p class="kicker reveal">03 — The playbook</p>
-        <h2 class="h2 split">Three pillars. <em>One rolling launch.</em></h2>
-        <div class="pillar-stack">
-          <article class="pillar glass reveal">
-            <span class="pillar-n">I</span>
-            <h3>Spread the word on social.</h3>
-            <p>Coordinated waves across X, LinkedIn, YouTube and Instagram, so launch day looks like the whole internet noticed at once.</p>
-          </article>
-          <article class="pillar glass reveal">
-            <span class="pillar-n">II</span>
-            <h3>Reach the right people.</h3>
-            <p>Operators, builders and VCs, reached through the communities, newsletters and niche channels they actually trust.</p>
-          </article>
-          <article class="pillar glass reveal">
-            <span class="pillar-n">III</span>
-            <h3>Show your product clearly.</h3>
-            <p>Launch videos made in our own studios that explain what you built in the first few seconds.</p>
-          </article>
+        <div class="reel-grid">
+          <figure class="reel reveal">
+            <div class="reel-media"><img src="assets/work/higgsfield.jpg" alt="Creator reel for Higgsfield AI" loading="lazy" width="576" height="971" /></div>
+            <figcaption><b>Higgsfield</b><span>Creator reel · Instagram</span></figcaption>
+          </figure>
+          <figure class="reel reveal">
+            <div class="reel-media"><img src="assets/work/replit.jpg" alt="Creator reel for Replit" loading="lazy" width="591" height="987" /></div>
+            <figcaption><b>Replit</b><span>Creator reel · Instagram</span></figcaption>
+          </figure>
+          <figure class="reel reveal">
+            <div class="reel-media"><img src="assets/work/polsia.jpg" alt="Creator reel for Polsia AI" loading="lazy" width="577" height="966" /></div>
+            <figcaption><b>Polsia</b><span>Creator reel · Instagram</span></figcaption>
+          </figure>
         </div>
-      </div>
-    </section>
-
-    <!-- 05 Distribution -->
-    <section class="section channels" id="channels" data-scene="channels">
-      <div class="wrap">
-        <div class="split-head">
-          <p class="kicker reveal">04 — Distribution</p>
-          <h2 class="h2 split">Seven surfaces. <em>Every one pointed at your launch.</em></h2>
-        </div>
-        <div class="channel-grid">
-          <article class="channel glass reveal"><span class="ch-n">01</span><h3>Influencer campaigns</h3><p>Creators across LinkedIn, YouTube and Instagram who already hold your buyers’ attention.</p></article>
-          <article class="channel glass reveal"><span class="ch-n">02</span><h3>WhatsApp communities</h3><p>Private groups of AI operators, builders and VCs, where opinions form before they go public.</p></article>
-          <article class="channel glass reveal"><span class="ch-n">03</span><h3>Reddit marketing</h3><p>Native, credible presence in the threads where technical users compare tools.</p></article>
-          <article class="channel glass reveal"><span class="ch-n">04</span><h3>LinkedIn profiles &amp; pages</h3><p>Founder profiles and company pages that build credibility with decision-makers.</p></article>
-          <article class="channel glass reveal"><span class="ch-n">05</span><h3>Niche YouTube channels</h3><p>Deep-dive formats on the channels your users actually subscribe to.</p></article>
-          <article class="channel glass reveal"><span class="ch-n">06</span><h3>Newsletter integrations</h3><p>Placements inside the inboxes the AI crowd reads every morning.</p></article>
-          <article class="channel glass reveal feature"><span class="ch-n">07</span><h3>Launch videos, in-house</h3><p>Made in Owled’s own studios by the people who make the rest of the campaign. Story, edit and distribution in one room.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 06 Voice -->
-    <section class="section voice" id="voice" data-scene="voice">
-      <div class="wrap">
-        <p class="kicker reveal">05 — How it sounds</p>
-        <h2 class="h2 split narrow">Messaging that sounds like <em>your founder</em>, not an agency.</h2>
-        <ul class="principles">
-          <li class="reveal"><span>A</span><div><h3>Audience-centric</h3><p>Written for the reader’s problem, not the product’s feature list.</p></div></li>
-          <li class="reveal"><span>B</span><div><h3>Founder-aligned voice</h3><p>Every post, script and caption sounds like it came from you.</p></div></li>
-          <li class="reveal"><span>C</span><div><h3>Precise positioning</h3><p>One sharp idea about why you matter, repeated until it sticks.</p></div></li>
-          <li class="reveal"><span>D</span><div><h3>Adaptive &amp; scalable</h3><p>The same story, re-cut for each channel and audience as the launch grows.</p></div></li>
+        <ul class="ai-more reveal" aria-label="More AI campaigns">
+          <li data-logo="wisprflow">Wispr Flow</li>
+          <li data-logo="openai">OpenAI</li>
+          <li data-logo="gamma">Gamma</li>
         </ul>
       </div>
     </section>
 
-    <!-- 07 Scale -->
-    <section class="section scale" id="scale" data-scene="scale">
+    <!-- ───────── 6. Case studies (dark) ───────── -->
+    <section class="section cases" id="cases" aria-labelledby="cases-h">
       <div class="wrap">
-        <p class="kicker reveal">06 — Momentum, measured</p>
-        <h2 class="h2 split">The mass behind <em>the ball.</em></h2>
-        <div class="stats">
-          <div class="stat reveal"><b><span data-count="1.6" data-decimals="1">0</span>Bn</b><span>views across launch campaigns</span></div>
-          <div class="stat reveal"><b><span data-count="500">0</span>M+</b><span>views a month across owned pages</span></div>
-          <div class="stat reveal"><b><span data-count="50">0</span>+</b><span>in-house pages</span></div>
-          <div class="stat reveal"><b><span data-count="200">0</span>+</b><span>strategists, producers &amp; editors</span></div>
+        <div class="section-head">
+          <p class="kicker kicker-light">Case studies</p>
+          <h2 class="h2 h2-light" id="cases-h">Campaigns that <em>travelled.</em></h2>
         </div>
-        <p class="source reveal">Figures for Owled, Snoball’s parent company.</p>
+
+        <article class="case-feature reveal">
+          <div class="cf-media"><img src="assets/work/accel-video.jpg" alt="Accel Atoms integration in Tanmay Bhat's YouTube video" loading="lazy" width="900" height="265" /></div>
+          <div class="cf-body">
+            <span class="case-type">Quirky marketing · YouTube</span>
+            <h3>Accel Atoms × Tanmay Bhat</h3>
+            <p>An Accel Atoms pitch placed inside a comedy review video on a 5.28M-subscriber channel, with a pinned “apply here” link in the comments.</p>
+            <dl class="cf-stats">
+              <div><dt>Impressions</dt><dd>28.7M</dd></div>
+              <div><dt>Click-through rate</dt><dd>7.6%</dd></div>
+              <div><dt>Views</dt><dd>2.8M</dd></div>
+              <div><dt>Unique viewers</dt><dd>1.9M</dd></div>
+            </dl>
+          </div>
+        </article>
+
+        <div class="case-grid">
+          <article class="case reveal">
+            <span class="case-type">Creator distribution</span>
+            <h3>Zepto</h3>
+            <p>Positioned Zepto as the fastest way to find and buy gifts in 10 minutes, through creators.</p>
+            <dl><div><dt>Views</dt><dd>15.1M+</dd></div><div><dt>Likes</dt><dd>797K+</dd></div></dl>
+          </article>
+          <article class="case reveal">
+            <span class="case-type">Multi-format amplification</span>
+            <h3>ACKO</h3>
+            <p>Creator-led content, print amplification and platform-specific campaigns across car insurance, health insurance and LinkedIn.</p>
+            <dl><div><dt>Views</dt><dd>10M+</dd></div><div><dt>Likes</dt><dd>100K+</dd></div></dl>
+          </article>
+          <article class="case case-wide reveal">
+            <div class="case-copy">
+              <span class="case-type">Creator amplification</span>
+              <h3>Valour by boAt</h3>
+              <p>Positioned boAt’s Valour watch as a wellness-first, high-performance lifestyle product.</p>
+              <dl><div><dt>Views</dt><dd>6.5M+</dd></div><div><dt>Likes</dt><dd>186K+</dd></div></dl>
+            </div>
+            <div class="case-strip">
+              <img src="assets/work/boat-1.jpg" alt="Creator post for Valour by boAt" loading="lazy" width="561" height="905" />
+              <img src="assets/work/boat-2.jpg" alt="Creator post for Valour by boAt" loading="lazy" width="686" height="961" />
+              <img src="assets/work/boat-3.jpg" alt="Creator post for Valour by boAt" loading="lazy" width="610" height="905" />
+              <img src="assets/work/boat-4.jpg" alt="Creator post for Valour by boAt" loading="lazy" width="548" height="905" />
+            </div>
+          </article>
+          <article class="case reveal">
+            <span class="case-type">Influencer marketing + content</span>
+            <h3>Godrej Properties</h3>
+            <p>Told the story of what the brand stands for, from sustainability to labour welfare and DEI.</p>
+            <dl><div><dt>Views</dt><dd>6.5M+</dd></div><div><dt>Likes</dt><dd>14K+</dd></div></dl>
+          </article>
+          <article class="case reveal">
+            <span class="case-type">Viral video production</span>
+            <h3>Renée × Rebelkid</h3>
+            <p>Four videos built for virality on Instagram from the ground up.</p>
+            <dl><div><dt>Views</dt><dd>3.8M+</dd></div><div><dt>Videos</dt><dd>4</dd></div></dl>
+          </article>
+        </div>
       </div>
     </section>
 
-    <!-- 08 Owled -->
-    <section class="section owled" id="owled" data-scene="owled">
-      <div class="wrap owled-grid">
+    <!-- ───────── 7. How we launch ───────── -->
+    <section class="section how" id="how" aria-labelledby="how-h">
+      <div class="wrap how-grid">
         <div>
-          <p class="kicker reveal">07 — Part of Owled</p>
-          <h2 class="h2 split">Snoball is Owled’s arm for <em>AI launches and growth.</em></h2>
-          <p class="body reveal">Owled helps AI and tech companies launch, working mostly with Series A/B+ teams. Snoball brings that machine to the companies, creators and thought leaders shaping AI.</p>
+          <p class="kicker">How we launch</p>
+          <h2 class="h2" id="how-h">From brief to go-live <em>in five steps.</em></h2>
+          <p class="body">One team owns the creators, the story, the edit and the distribution, so nothing gets lost between agencies.</p>
         </div>
-        <ul class="services reveal">
-          <li><span>01</span>Launch videos</li>
-          <li><span>02</span>Launch amplification</li>
-          <li><span>03</span>Influencer marketing</li>
+        <ol class="steps">
+          <li class="reveal"><span class="step-n">1</span><div><h3>Creator shortlist</h3><p>We pick the people whose verdict your audience trusts, from anchor voices down to practitioners.</p></div></li>
+          <li class="reveal"><span class="step-n">2</span><div><h3>Creative &amp; calendar</h3><p>Concepts, hooks and a launch calendar agreed with you before anything is shot.</p></div></li>
+          <li class="reveal"><span class="step-n">3</span><div><h3>Scripts &amp; visuals</h3><p>Every script written in your founder’s voice and locked with you.</p></div></li>
+          <li class="reveal"><span class="step-n">4</span><div><h3>Production</h3><p>Shot and edited in our own studios, re-cut for every channel.</p></div></li>
+          <li class="reveal"><span class="step-n">5</span><div><h3>Approval &amp; go-live</h3><p>A coordinated launch-day spike, then a steady drip that keeps the conversation going.</p></div></li>
+        </ol>
+      </div>
+      <div class="wrap">
+        <ul class="principles">
+          <li class="reveal"><h3>Audience-centric</h3><p>Written for the reader’s problem, not your feature list.</p></li>
+          <li class="reveal"><h3>Founder-aligned voice</h3><p>Every post and script sounds like it came from you.</p></li>
+          <li class="reveal"><h3>Precise positioning</h3><p>One sharp idea, repeated until it sticks.</p></li>
+          <li class="reveal"><h3>Adaptive &amp; scalable</h3><p>The same story, re-cut for each channel as you grow.</p></li>
         </ul>
       </div>
     </section>
 
-    <!-- 09 CTA -->
-    <section class="section cta" id="start" data-scene="cta">
-      <div class="wrap center">
-        <p class="kicker reveal">Your turn</p>
-        <h2 class="mega split">Start your <em>snoball.</em></h2>
-        <p class="lede reveal">Tell us what you’re launching. We’ll show you where the conversation starts.</p>
-        <!-- TODO: replace with the real Snoball contact address or booking link -->
-        <a href="mailto:?subject=Snoball%20%E2%80%94%20launch%20enquiry" class="btn btn-solid btn-lg reveal">Plan your launch <span aria-hidden="true">→</span></a>
+    <!-- ───────── 8. Scale ───────── -->
+    <section class="section scale" id="scale" aria-labelledby="scale-h">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="kicker">Built inside Owled</p>
+          <h2 class="h2" id="scale-h">The machine behind <em>the ball.</em></h2>
+        </div>
+        <dl class="stats">
+          <div class="stat reveal"><dt>views across launch campaigns</dt><dd><span data-count="1.6" data-decimals="1">1.6</span>Bn</dd></div>
+          <div class="stat reveal"><dt>views a month on owned pages</dt><dd><span data-count="500">500</span>M+</dd></div>
+          <div class="stat reveal"><dt>in-house pages</dt><dd><span data-count="50">50</span>+</dd></div>
+          <div class="stat reveal"><dt>strategists, producers &amp; editors</dt><dd><span data-count="200">200</span>+</dd></div>
+        </dl>
       </div>
-      <footer class="footer">
-        <span>© <span id="year"></span> Snoball · An Owled brand</span>
-        <span>X · LinkedIn · YouTube · Instagram · Reddit</span>
-      </footer>
+    </section>
+
+    <!-- ───────── 9. CTA ───────── -->
+    <section class="cta" id="start" aria-labelledby="cta-h">
+      <canvas class="snow-canvas cta-canvas" id="snow-cta" aria-hidden="true"></canvas>
+      <div class="wrap cta-inner">
+        <p class="kicker kicker-light">Your turn</p>
+        <h2 class="mega" id="cta-h">Start your <em>snoball.</em></h2>
+        <p class="cta-sub">Tell us what you’re launching. We’ll show you where the conversation starts.</p>
+        <!-- TODO: replace with the real Snoball contact address or booking link -->
+        <a href="mailto:?subject=Snoball%20launch%20enquiry" class="btn btn-white btn-lg">Book a launch call</a>
+      </div>
     </section>
   </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <a href="#top" class="brand brand-small"><span class="brand-ball" aria-hidden="true"></span><span class="brand-word">snoball</span></a>
+      <span>An Owled brand · © <span id="year">2026</span></span>
+    </div>
+  </footer>
 
   <script type="module" src="js/main.js"></script>
 </body>

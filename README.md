@@ -1,26 +1,35 @@
 # Snoball — website
 
-Single-page site for Snoball, Owled's brand for AI and tech launches and growth marketing.
+Marketing site for Snoball, Owled's brand for AI and tech launches. It's a static site (HTML, CSS and JS) with no build step. Three.js r169 is vendored in `vendor/`.
 
-The page uses plain HTML, CSS and JS with no build step. Three.js (r169) is vendored in `vendor/`.
+**Live:** https://tjcodeiimb.github.io/snoball/ (GitHub Pages, redeploys on every push)
 
 ## Run locally
 
 ```sh
-python3 -m http.server 8000
-# open http://localhost:8000
+python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-You need a local server because ES modules don't load from `file://`.
+## Page flow
 
-## How it works
+1. **Hero bento:** what Snoball does, the cartoon snowball, the 1.6Bn proof number and where a launch starts.
+2. **Clients:** fixed top row (Apple, Emergent, Wispr Flow, OpenAI, Replit, Gamma) plus two sliding rows.
+3. **Belief:** the X-first channel order.
+4. **Services:** launch videos, launch amplification and creator campaigns.
+5. **Past work:** AI creator reels.
+6. **Case studies:** Accel Atoms × Tanmay Bhat, Zepto, ACKO, boAt Valour, Godrej, Renée.
+7. **How we launch:** five steps and the messaging principles.
+8. **Scale:** Owled numbers.
+9. **CTA:** "Start your snoball".
 
-- **Scroll only.** The page uses normal vertical scrolling. Nothing hijacks it and nothing scrolls horizontally. The 3D canvas is fixed behind the content and reads `window.scrollY`.
-- **The snowball.** A frosted core is surrounded by about 16k particles (7k on mobile). The particles spiral in and stick to the ball as you scroll down, so the ball "gathers mass". It spins faster while you're scrolling, and at the stats section it flares into a corona.
-- **Channel rings.** In the "where conversations happen" section, seven orbit rings stand for X → LinkedIn → YouTube → Instagram → Reddit → Newsletters → Communities. The ring for the channel you're reading lights up.
-- **Keyframes.** `KEYS` at the top of `js/main.js` sets the ball's position, size, accretion, rings and burst for each section. Desktop uses `x/y/s/dim` and mobile uses `mx/my/ms/mdim`. Tweak these to re-choreograph the page.
+## Editing
+
+- **Client logos:** edit the `TOP`, `ROW_A` and `ROW_B` lists in `js/main.js`. Logo files go in `assets/logos/` and are listed in `manifest.json`. A brand without a file shows as its typeset name.
+- **Campaign images:** stored in `assets/work/` and cropped from the Owled credentials deck.
+- **Intro animation:** the `intro()` block in `js/main.js` copies the upforgeconsulting.com hero entrance. It plays once per fresh visit and is skipped for reduced-motion users.
+- **Snowball:** see `createSnowball()` in `js/main.js`.
 
 ## Before launch
 
-- Replace the `mailto:` placeholder on the CTA in `index.html` (marked `TODO`) with the real contact or booking link.
-- The stats are Owled's public website figures. Figures mentioned only on the call (revenue, video volume, studio count) are left out on purpose.
+- Replace the `mailto:` placeholder on the closing CTA (marked `TODO` in `index.html`) with the real booking link.
+- Confirm Apple and Emergent are approved to appear as clients.
